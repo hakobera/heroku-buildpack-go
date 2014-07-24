@@ -1,5 +1,3 @@
-#!/bin/sh
-
 before() {
   rm -rf build cache
   cp -r test build

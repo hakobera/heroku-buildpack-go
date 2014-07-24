@@ -1,3 +1,5 @@
+#!/bin/sh
+
 before() {
   cp -r test detect-test
 }
