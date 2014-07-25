@@ -46,7 +46,14 @@ fi
 plat=$(uname|tr A-Z a-z)-$arch
 
 # Python
-PATH=$buildpack/$plat/bin:$PATH
+venv=$cache/venv
+mkdir -p $cache/pip
+python=python2.7
+PATH=$buildpack/$plat/bin:$venv/bin:$PATH
+
+virtualenv() {
+		python "$buildpack/vendor/virtualenv-1.11.6/virtualenv.py" "$@"
+}
 
 if test -f $build/Gomfile
 then
@@ -85,6 +92,26 @@ GOBIN=$build/bin export GOBIN
 GOROOT=$cache/$ver/go export GOROOT
 GOPATH=$build/.heroku/g export GOPATH
 PATH=$GOROOT/bin:$PATH
+
+if ! (which hg >/dev/null && which bzr >/dev/null)
+then
+    echo
+    echo "       Tired of waiting for bzr and hg?"
+    echo
+    
+		echo -n "       Installing Virtualenv..."
+	  virtualenv --python $python --distribute --never-download --prompt='(venv) ' $venv > /dev/null 2>&1
+	  . $venv/bin/activate > /dev/null 2>&1
+	  echo " done"
+
+	  echo -n "       Installing Mercurial..."
+	  pip install mercurial > /dev/null 2>&1
+	  echo " done"
+																										    
+		echo -n "       Installing Bazaar..."
+	  pip install bzr > /dev/null 2>&1
+	  echo " done"
+fi
 
 p=$GOPATH/src/$name
 mkdir -p $p
